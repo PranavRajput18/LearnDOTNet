@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NZWalks.API.Data;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTO;
@@ -36,10 +37,30 @@ namespace NZWalks.API.Repositories
             return existWalk;
         }
 
-        public async Task<List<Walk>> GetAll()
+        public async Task<List<Walk>> GetAllAsync(string? filtetOn,string? filterQuery,string? sortBy,bool isAsending,int pageNumber,int pageSize)
         {
-           var walks =  await dbContext.Walks.Include("Difficulty").Include("Region").ToListAsync();
-            return walks;
+            var walks = dbContext.Walks.Include("Difficulty").Include("Region").AsQueryable();
+
+            //Filtering
+            if (!filtetOn.IsNullOrEmpty() && !filterQuery.IsNullOrEmpty())
+            {
+                if (filtetOn.Equals("Name",StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = walks.Where(x => x.Name.Contains(filterQuery));
+                }
+            }
+
+            //Sorting
+            if (!sortBy.IsNullOrEmpty())
+            {
+                walks = isAsending ? walks.OrderBy(x=>x.Name):walks.OrderByDescending(x=>x.Name);
+            }
+
+            //Pagination
+            var skipResults = (pageNumber -1) * pageSize;
+
+            return await walks.Skip(skipResults).Take(pageSize).ToListAsync();
+            
         }
 
         public async Task<Walk> GetByIdAsync(Guid id)
