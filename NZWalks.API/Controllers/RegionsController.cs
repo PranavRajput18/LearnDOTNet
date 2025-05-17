@@ -13,7 +13,7 @@ namespace NZWalks.API.Controllers
     [ApiController]
     public class RegionsController : ControllerBase
     {
-        private readonly NZWalksDbContext dbContext;
+
         private readonly IRegionRepository regionRepository;
         private readonly IMapper mapper;
 
@@ -39,9 +39,7 @@ namespace NZWalks.API.Controllers
         [Route("{id:Guid}")]
         public async Task<IActionResult> GetById([FromRoute]Guid id)
         {
-            // var region = dbContext.Regions.Find(id);
 
-            //LINQ Method
             var regionDomain = await regionRepository.GetByIdAsync(id);
 
             if (regionDomain == null)
