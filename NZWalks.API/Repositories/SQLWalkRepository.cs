@@ -42,7 +42,7 @@ namespace NZWalks.API.Repositories
             var walks = dbContext.Walks.Include("Difficulty").Include("Region").AsQueryable();
 
             //Filtering
-            if (!filtetOn.IsNullOrEmpty() && !filterQuery.IsNullOrEmpty())
+            if (!string.IsNullOrEmpty(filtetOn) && !string.IsNullOrEmpty(filterQuery))
             {
                 if (filtetOn.Equals("Name",StringComparison.OrdinalIgnoreCase))
                 {
@@ -51,7 +51,7 @@ namespace NZWalks.API.Repositories
             }
 
             //Sorting
-            if (!sortBy.IsNullOrEmpty())
+            if (!string.IsNullOrEmpty(sortBy))
             {
                 walks = isAsending ? walks.OrderBy(x=>x.Name):walks.OrderByDescending(x=>x.Name);
             }
